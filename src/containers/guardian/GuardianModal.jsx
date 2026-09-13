@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Form, Input, Modal, Spin, message } from "antd";
-import axiosInstance from "../../services/axiosInstance";
+import axiosInstance from "../../services/AxiosInstance";
 import styles from "./GuardianModal.module.css";
 
 function GuardianModal({ open, studentId, studentName, onClose }) {
