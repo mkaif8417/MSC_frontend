@@ -1,0 +1,35 @@
+.wrapper {
+  padding: 8px 4px;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0a463b;
+  margin-bottom: 2px;
+}
+
+.subheading {
+  font-size: 13.5px;
+  color: #6b7c78;
+  margin-bottom: 0;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.table th {
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #6b7c78;
+  border-bottom-width: 1px;
+}
+
+.table td {
+  vertical-align: middle;
+  font-size: 14px;
+}

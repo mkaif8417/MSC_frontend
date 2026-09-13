@@ -1,0 +1,22 @@
+.studentModalDiv {
+  overflow-y: scroll;
+  height: auto;
+  max-height: 60vh;
+  padding-right: 4px;
+}
+
+.form {
+  padding-top: 8px;
+}
+
+.helperText {
+  margin: -12px 0 12px;
+  color: #999;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .studentModalDiv {
+    max-height: 70vh;
+  }
+}

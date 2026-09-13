@@ -1,0 +1,56 @@
+
+.studyCenterModalDiv {
+  overflow-y: scroll;
+  height: auto;
+  max-height: 60vh;
+}
+.form {
+    padding-top: 8px;
+}
+
+.fullWidth {
+    width: 100%;
+}
+
+@media (max-width: 576px) {
+    .form {
+        padding-top: 4px;
+    }
+}
+
+.locationSection {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.locationSectionTitle {
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #8c8c8c;
+  margin-bottom: 12px;
+}
+
+.locationGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 16px;
+}
+
+.locationBreadcrumb {
+  font-size: 12px;
+  color: #595959;
+  padding-top: 8px;
+  border-top: 1px dashed #d9d9d9;
+  margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  .locationGrid {
+    grid-template-columns: 1fr;
+  }
+}

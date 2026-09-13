@@ -1,0 +1,107 @@
+.studyCenterModalDiv {
+  overflow-y: scroll;
+  height: auto;
+  max-height: 60vh;
+}
+
+.form {
+  padding-top: 8px;
+}
+
+.quickSearchDivider {
+  font-size: 11px;
+  color: #bfbfbf;
+  text-align: center;
+  margin: 4px 0 12px;
+}
+
+.locationSection {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.locationSectionTitle {
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #8c8c8c;
+  margin-bottom: 12px;
+}
+
+.locationGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 16px;
+}
+
+.locationBreadcrumb {
+  font-size: 12px;
+  color: #595959;
+  padding-top: 8px;
+  border-top: 1px dashed #d9d9d9;
+  margin-top: 4px;
+}
+
+.facilitiesSection {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.sectionTitle {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.facilityItem {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.facilityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.facilityName {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.facilityField {
+  margin-bottom: 12px;
+}
+
+.facilityField:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 480px) {
+  .locationGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .studyCenterModalDiv {
+    max-height: 70vh;
+  }
+
+  .facilityItem {
+    padding: 14px;
+  }
+
+  .sectionTitle {
+    font-size: 17px;
+  }
+}

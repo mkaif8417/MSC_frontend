@@ -1,0 +1,22 @@
+.gradeBadge {
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    min-width: 28px;
+    text-align: center;
+}
+
+.gradeA {
+    background-color: #d1fae5;
+    color: #047857;
+}
+
+.gradeB {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.gradeC {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}

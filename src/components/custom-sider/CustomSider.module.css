@@ -1,0 +1,335 @@
+.sidebar {
+  width: 74px;
+  min-height: 100vh;
+  background: linear-gradient(165deg, #0d5445 0%, #073b30 60%, #052c24 100%);
+  padding: 18px 10px;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.25);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.sidebar:hover {
+  width: 250px;
+}
+
+/* Logo badge */
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg, #23a67e, #0f7a5c);
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Base link — every possible pseudo-state pinned to the same color,
+   so no browser/Bootstrap default (visited/blue) can ever show through */
+.link,
+.link:link,
+.link:visited,
+.link:hover,
+.link:focus,
+.link:active {
+  color: #cfe6dc !important;
+}
+
+.link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 12px;
+  margin-bottom: 4px;
+  border-radius: 10px;
+  white-space: nowrap;
+  text-decoration: none !important;
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease,
+    border-radius 0.2s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-left: 3px solid transparent;
+}
+
+.link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff !important;
+  transform: translateX(3px);
+}
+
+/* Little "ping" animation the first time an item becomes active */
+.link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.35);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.linkActive::after {
+  animation: pingOnce 0.5s ease-out;
+}
+
+@keyframes pingOnce {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+/* Active route — flat left edge with a solid accent bar, rounded only
+   on the right, matching the stat-card left-border treatment on the
+   dashboard rather than a full all-round pill. */
+.linkActive,
+.linkActive:link,
+.linkActive:visited,
+.linkActive:hover,
+.linkActive:focus,
+.linkActive:active {
+  background: #eafff4;
+  color: #0a463b !important;
+}
+
+.linkActive {
+  font-weight: 600;
+  border-radius: 0 10px 10px 0;
+  border-left: 3px solid #c9932f;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.linkActive:hover {
+  background: #ffffff;
+  transform: none;
+}
+
+.linkActive .icon {
+  color: #0a463b;
+}
+
+.linkActive .icon svg {
+  fill: rgba(10, 70, 59, 0.12);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  flex-shrink: 0;
+  color: #9fd6c1;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.icon svg {
+  display: block;
+  fill: transparent;
+  stroke-width: 1.8;
+  transition: transform 0.25s ease, fill 0.25s ease;
+}
+
+.link:hover .icon,
+.menuButton:hover .icon {
+  color: #4ade80;
+  transform: scale(1.08);
+}
+
+.link:hover .icon svg,
+.menuButton:hover .icon svg {
+  fill: rgba(74, 222, 128, 0.15);
+}
+
+.text {
+  opacity: 0;
+  transition: opacity 0.2s ease 0.08s;
+}
+
+.sidebar:hover .text {
+  opacity: 1;
+}
+
+.overlay {
+  display: none;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1050;
+    width: 250px;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .sidebar:hover {
+    width: 250px;
+  }
+
+  .sidebar.mobileOpen {
+    transform: translateX(0);
+  }
+
+  .text {
+    opacity: 1;
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1040;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.2s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.menuButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 11px 12px;
+  margin-bottom: 4px;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #cfe6dc;
+  text-align: left;
+  white-space: nowrap;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease,
+    border-color 0.25s ease;
+}
+
+.menuButton .text {
+  flex: 0 1 auto;
+}
+
+.menuButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+.arrow {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.7;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+.menuButton:hover .arrow {
+  opacity: 1;
+}
+
+.arrowOpen {
+  transform: rotate(180deg);
+}
+
+.submenu {
+  margin-bottom: 4px;
+  padding-left: 38px;
+  overflow: hidden;
+  animation: expandDown 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes expandDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.subLink,
+.subLink:link,
+.subLink:visited,
+.subLink:hover,
+.subLink:focus {
+  color: #b8ddd0;
+}
+
+.subLink {
+  display: block;
+  padding: 8px 12px;
+  text-decoration: none !important;
+  font-size: 13.5px;
+  font-weight: 450;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  box-sizing: border-box;
+  transition: background 0.2s ease, color 0.2s ease, padding-left 0.2s ease,
+    border-radius 0.2s ease;
+}
+
+.subLink:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  padding-left: 16px;
+}
+
+.subLink.linkActive,
+.subLink.linkActive:link,
+.subLink.linkActive:visited,
+.subLink.linkActive:hover,
+.subLink.linkActive:focus {
+  background: #eafff4;
+  color: #0a463b;
+}
+
+.subLink.linkActive {
+  font-weight: 600;
+  box-shadow: none;
+  border-radius: 0 8px 8px 0;
+  border-left: 3px solid #c9932f;
+}
+
+@media (max-width: 767px) {
+  .menuButton {
+    color: #ffffff;
+  }
+}

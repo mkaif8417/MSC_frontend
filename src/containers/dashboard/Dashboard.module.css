@@ -1,0 +1,342 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap");
+
+.page {
+  --ink: #17241f;
+  --muted: #5b685f;
+  --brand: #0f5c4d;
+  --brand-soft: #e4efe9;
+  --accent-gold: #c9932f;
+  --border: #dde4de;
+  --bg: #f7f8f6;
+
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------
+   Hero
+--------------------------------------------------------- */
+.hero {
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 6px 0;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+
+.heroTitle {
+  margin: 0 0 6px 0;
+  font-family: "Fraunces", Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  font-size: 32px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.heroSubtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  max-width: 56ch;
+}
+
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+
+/* ---------------------------------------------------------
+   Stat cards
+--------------------------------------------------------- */
+.statCard {
+  height: 100%;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent, var(--brand));
+  border-radius: 6px;
+}
+
+.statIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.statLabel {
+  margin: 0 0 6px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.statValue {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 500;
+  font-size: 30px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------
+   Section shell
+--------------------------------------------------------- */
+.sectionCard {
+  padding: 22px 24px 8px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.sectionHeader {
+  margin-bottom: 14px;
+}
+
+.sectionTitle {
+  margin: 0 0 2px 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--ink);
+}
+
+.sectionSubtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.emptyState {
+  padding: 32px 0;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------
+   Division list (expandable rows)
+--------------------------------------------------------- */
+.divisionList {
+  display: flex;
+  flex-direction: column;
+}
+
+.divisionBlock {
+  border-top: 1px solid var(--border);
+}
+
+.divisionBlock:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.divisionHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.divisionHeader:hover {
+  background: #fafbfa;
+}
+
+.divisionHeaderLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.chevron {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--muted);
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  color: var(--brand);
+}
+
+.divisionName {
+  margin: 0;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.divisionMeta {
+  margin: 2px 0 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.divisionHeaderStats {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  justify-content: flex-end;
+}
+
+.divisionStat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 74px;
+}
+
+.divisionStatValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.divisionStatLabel {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.divisionBarTrack {
+  width: 90px;
+  height: 5px;
+  background: var(--brand-soft);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.divisionBarFill {
+  height: 100%;
+  background: var(--brand);
+  border-radius: 3px;
+}
+
+/* Pure-CSS expand/collapse — no JS height measuring needed */
+.districtPanel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+
+.districtPanelInner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.districtTableWrapper {
+  overflow-x: auto;
+  padding: 4px 4px 18px 30px;
+}
+
+.districtTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.districtTable thead th {
+  padding: 8px 14px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+
+.districtTable tbody td {
+  padding: 10px 14px;
+  font-size: 13.5px;
+  color: var(--ink);
+  border-bottom: 1px solid #f0f2f1;
+}
+
+.districtTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.districtName {
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.miniBarCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.miniBarValue {
+  min-width: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.miniBarTrack {
+  width: 60px;
+  height: 4px;
+  background: var(--brand-soft);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.miniBarFill {
+  height: 100%;
+  background: var(--accent-gold);
+  border-radius: 2px;
+}
+
+/* ---------------------------------------------------------
+   Responsive
+--------------------------------------------------------- */
+@media (max-width: 768px) {
+  .divisionHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .divisionHeaderStats {
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .divisionStat {
+    align-items: flex-start;
+  }
+
+  .divisionBarTrack {
+    display: none;
+  }
+
+  .districtTableWrapper {
+    padding-left: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron,
+  .districtPanel {
+    transition: none;
+  }
+}

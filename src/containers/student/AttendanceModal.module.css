@@ -1,0 +1,25 @@
+.form {
+  margin-bottom: 24px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.historySection {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 16px;
+}
+
+.historyTitle {
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #595959;
+}
