@@ -4,7 +4,7 @@ import { Table, Modal, Form, Button, Badge } from "react-bootstrap";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
 import programService from "../../services/programService";
-import axiosInstance from "../../services/axiosInstance";
+import axiosInstance from "../../services/AxiosInstance";
 import styles from "./Program.module.css";
 
 const FREQUENCIES = ["Weekly", "Monthly", "Quarterly"];

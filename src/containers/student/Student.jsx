@@ -25,7 +25,7 @@ import {
   TeamOutlined,
 } from "@ant-design/icons";
 
-import axiosInstance from "../../services/axiosInstance";
+import axiosInstance from "../../services/AxiosInstance";
 import StudentModal from "./StudentModal";
 import GuardianModal from "../guardian/GuardianModal";
 import AttendanceModal from "./AttendanceModal";
