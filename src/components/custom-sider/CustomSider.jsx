@@ -40,7 +40,6 @@ function CustomSider({ sidebarOpen, setSidebarOpen }) {
     // Items that render BEFORE the Program collapsible section.
     const itemsBeforeProgram = [
        { to: "/mosque-management", label: "Mosque Management", Icon: PiMosqueThin },
-        { to: "/study-center", label: "Study Center", Icon: School },
         { to: "/teachers", label: "Teachers", Icon: GraduationCap },
         { to: "/coordinators", label: "Coordinators", Icon: UserCog },
         { to: "/students", label: "Students", Icon: Users },
@@ -56,6 +55,7 @@ function CustomSider({ sidebarOpen, setSidebarOpen }) {
     const locationLinks = [
         { to: "/location/states", label: "State" },
         { to: "/location/divisions", label: "Division" },
+        { to: "/location/regions", label: "Region" },
         { to: "/location/districts", label: "District" },
         { to: "/location/talukas", label: "Taluka" },
         { to: "/location/villages-cities", label: "Village / City" },

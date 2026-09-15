@@ -1,12 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
+import dayjs from "dayjs";
 import {
+  Button,
+  DatePicker,
+  Divider,
   Form,
   Input,
   InputNumber,
   Modal,
   Select,
+  Switch,
   message,
 } from "antd";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
 import axiosInstance from "../../../services/AxiosInstance";
 import styles from "./MosqueModal.module.css";
@@ -15,14 +21,46 @@ import styles from "./MosqueModal.module.css";
 // or as a populated object (e.g. { _id, name }).
 const idOf = (value) => value?._id || value || undefined;
 
+// Location flow: State -> Division -> Region -> District -> Taluka ->
+// Village/City -> Area/Locality
 const EMPTY_CHAIN = {
   stateId: undefined,
   divisionId: undefined,
+  regionId: undefined,
   districtId: undefined,
   talukaId: undefined,
   villageCityId: undefined,
   areaLocalityId: undefined,
 };
+
+const LED_BY_OPTIONS = ["Govt Support", "Masjid Led", "Community Led"].map(
+  (v) => ({ value: v, label: v })
+);
+
+const STUDY_CENTER_GRADE_OPTIONS = ["C", "C+", "B", "B+", "B++", "A", "A++"].map(
+  (v) => ({ value: v, label: v })
+);
+
+const FACILITY_CONDITION_OPTIONS = ["Good", "Needs Repair", "Not Available"].map(
+  (v) => ({ value: v, label: v })
+);
+
+const STAFF_ROLES = [
+  { key: "khateeb", label: "Khateeb" },
+  { key: "muazzin", label: "Muazzin" },
+  { key: "assistantMuazzin", label: "Assistant Muazzin" },
+  { key: "khadim", label: "Khadim" },
+];
+
+const FACILITY_FIELDS = [
+  { key: "electricity", label: "Electricity" },
+  { key: "fansAc", label: "Fans / AC" },
+  { key: "lights", label: "Lights" },
+  { key: "internetWifi", label: "Internet / WiFi" },
+  { key: "drinkingWater", label: "Drinking Water" },
+  { key: "toilets", label: "Toilets" },
+  { key: "libraryBooks", label: "Library Books" },
+];
 
 function MosqueModal({
   open,
@@ -36,9 +74,11 @@ function MosqueModal({
   const [loading, setLoading] = useState(false);
 
   // Full lists loaded once per modal open, used to build each cascading
-  // step (State -> Division -> District -> Taluka -> Village/City -> Area/Locality).
+  // step (State -> Division -> Region -> District -> Taluka -> Village/City
+  // -> Area/Locality).
   const [states, setStates] = useState([]);
   const [divisions, setDivisions] = useState([]);
+  const [regions, setRegions] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [talukas, setTalukas] = useState([]);
   const [villageCities, setVillageCities] = useState([]);
@@ -61,10 +101,15 @@ function MosqueModal({
         setLocationListsLoading(true);
 
         const commonParams = { page: 1, limit: 1000, isActive: true };
+        // /locations/regions rejects limit > 100 (VALIDATION_ERROR), unlike
+        // the other location endpoints — use a capped params object just
+        // for this one call.
+        const regionParams = { page: 1, limit: 100, isActive: true };
 
         const results = await Promise.allSettled([
           axiosInstance.get("/locations/states", { params: commonParams }),
           axiosInstance.get("/locations/divisions", { params: commonParams }),
+          axiosInstance.get("/locations/regions", { params: regionParams }),
           axiosInstance.get("/locations/districts", { params: commonParams }),
           axiosInstance.get("/locations/talukas", { params: commonParams }),
           axiosInstance.get("/locations/villages-cities", { params: commonParams }),
@@ -73,6 +118,7 @@ function MosqueModal({
         const [
           statesRes,
           divisionsRes,
+          regionsRes,
           districtsRes,
           talukasRes,
           villageCitiesRes,
@@ -86,6 +132,7 @@ function MosqueModal({
 
         setStates(extractArray(statesRes));
         setDivisions(extractArray(divisionsRes));
+        setRegions(extractArray(regionsRes));
         setDistricts(extractArray(districtsRes));
         setTalukas(extractArray(talukasRes));
         setVillageCities(extractArray(villageCitiesRes));
@@ -110,7 +157,7 @@ function MosqueModal({
   // =========================
   // Resolve the full ID chain backward from a chosen Area/Locality ID,
   // using the already-loaded lists. Used both by the quick-search box
-  // and by edit mode (to pre-fill the six selects).
+  // and by edit mode (to pre-fill the seven selects).
   // =========================
   const resolveIdChainFromAreaLocalityId = (areaLocalityId) => {
     const areaLocality = (areaLocalities || []).find(
@@ -125,12 +172,16 @@ function MosqueModal({
     const districtId = idOf(taluka?.districtId);
 
     const district = districts.find((d) => d._id === districtId);
-    const divisionId = idOf(district?.divisionId);
-    const stateId = idOf(district?.stateId);
+    const regionId = idOf(district?.regionId);
+
+    const region = regions.find((r) => r._id === regionId);
+    const divisionId = idOf(region?.divisionId);
+    const stateId = idOf(region?.stateId) || idOf(district?.stateId);
 
     return {
       stateId,
       divisionId,
+      regionId,
       districtId,
       talukaId,
       villageCityId,
@@ -146,6 +197,24 @@ function MosqueModal({
 
     if (mosqueData) {
       const areaLocalityId = idOf(mosqueData.areaLocalityId);
+
+      const masjidStaffValues = {};
+      STAFF_ROLES.forEach(({ key }) => {
+        masjidStaffValues[key] = {
+          name: mosqueData.masjidStaff?.[key]?.name || "",
+          contactNumber: mosqueData.masjidStaff?.[key]?.contactNumber || "",
+        };
+      });
+
+      const studyCenterFacilitiesValues = {};
+      FACILITY_FIELDS.forEach(({ key }) => {
+        studyCenterFacilitiesValues[key] = {
+          available: mosqueData.studyCenterFacilities?.[key]?.available || false,
+          condition:
+            mosqueData.studyCenterFacilities?.[key]?.condition ||
+            "Not Available",
+        };
+      });
 
       form.setFieldsValue({
         name: mosqueData.name || "",
@@ -166,6 +235,36 @@ function MosqueModal({
             : undefined,
         inchargeName: mosqueData.inchargeName || "",
         contactNumber: mosqueData.contactNumber || "",
+
+        ledBy: mosqueData.ledBy || undefined,
+        masjidStaff: masjidStaffValues,
+        nearestUnemployedGraduatesAndDropouts:
+          mosqueData.nearestUnemployedGraduatesAndDropouts || [],
+
+        studyCenterName: mosqueData.studyCenterName || "",
+        studyCenterStartDate: mosqueData.studyCenterStartDate
+          ? dayjs(mosqueData.studyCenterStartDate)
+          : undefined,
+        studyCenterTablesCount:
+          mosqueData.studyCenterTablesCount !== undefined
+            ? mosqueData.studyCenterTablesCount
+            : undefined,
+        studyCenterChairsCount:
+          mosqueData.studyCenterChairsCount !== undefined
+            ? mosqueData.studyCenterChairsCount
+            : undefined,
+        studyCenterCapacity:
+          mosqueData.studyCenterCapacity !== undefined
+            ? mosqueData.studyCenterCapacity
+            : undefined,
+        studyCenterRoomsCount:
+          mosqueData.studyCenterRoomsCount !== undefined
+            ? mosqueData.studyCenterRoomsCount
+            : undefined,
+        studyCenterInchargeName: mosqueData.studyCenterInchargeName || "",
+        studyCenterContactNumber: mosqueData.studyCenterContactNumber || "",
+        studyCenterGrade: mosqueData.studyCenterGrade || undefined,
+        studyCenterFacilities: studyCenterFacilitiesValues,
       });
 
       // Only resolvable once the lookup lists have actually loaded.
@@ -174,6 +273,7 @@ function MosqueModal({
         villageCities.length &&
         talukas.length &&
         districts.length &&
+        regions.length &&
         divisions.length &&
         states.length
       ) {
@@ -182,6 +282,7 @@ function MosqueModal({
         form.setFieldsValue({
           stateId: resolvedIds.stateId,
           divisionId: resolvedIds.divisionId,
+          regionId: resolvedIds.regionId,
           districtId: resolvedIds.districtId,
           talukaId: resolvedIds.talukaId,
           villageCityId: resolvedIds.villageCityId,
@@ -193,7 +294,17 @@ function MosqueModal({
       setChain(EMPTY_CHAIN);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, mosqueData, villageCities, talukas, districts, divisions, states, areaLocalities]);
+  }, [
+    open,
+    mosqueData,
+    villageCities,
+    talukas,
+    districts,
+    regions,
+    divisions,
+    states,
+    areaLocalities,
+  ]);
 
   // =========================
   // Cascading options — each filtered by the step above it
@@ -211,12 +322,20 @@ function MosqueModal({
     [divisions, chain.stateId]
   );
 
+  const regionOptions = useMemo(
+    () =>
+      regions
+        .filter((r) => idOf(r.divisionId) === chain.divisionId)
+        .map((r) => ({ value: r._id, label: r.name })),
+    [regions, chain.divisionId]
+  );
+
   const districtOptions = useMemo(
     () =>
       districts
-        .filter((d) => idOf(d.divisionId) === chain.divisionId)
+        .filter((d) => idOf(d.regionId) === chain.regionId)
         .map((d) => ({ value: d._id, label: d.name })),
-    [districts, chain.divisionId]
+    [districts, chain.regionId]
   );
 
   const talukaOptions = useMemo(
@@ -267,6 +386,7 @@ function MosqueModal({
     setChain({ ...EMPTY_CHAIN, stateId: value });
     form.setFieldsValue({
       divisionId: undefined,
+      regionId: undefined,
       districtId: undefined,
       talukaId: undefined,
       villageCityId: undefined,
@@ -278,6 +398,25 @@ function MosqueModal({
     setChain((prev) => ({
       ...prev,
       divisionId: value,
+      regionId: undefined,
+      districtId: undefined,
+      talukaId: undefined,
+      villageCityId: undefined,
+      areaLocalityId: undefined,
+    }));
+    form.setFieldsValue({
+      regionId: undefined,
+      districtId: undefined,
+      talukaId: undefined,
+      villageCityId: undefined,
+      areaLocalityId: undefined,
+    });
+  };
+
+  const handleRegionChange = (value) => {
+    setChain((prev) => ({
+      ...prev,
+      regionId: value,
       districtId: undefined,
       talukaId: undefined,
       villageCityId: undefined,
@@ -335,8 +474,8 @@ function MosqueModal({
   // =========================
   // Quick search: pick an Area/Locality directly by name/code (e.g. "12"
   // for Shaheen_Colony, or "SH" for shaheen nagar) — auto-fills the whole
-  // chain above it in one shot: State -> Division -> District -> Taluka ->
-  // Village/City -> Area/Locality.
+  // chain above it in one shot: State -> Division -> Region -> District ->
+  // Taluka -> Village/City -> Area/Locality.
   // =========================
   const handleQuickAreaLocalitySearch = (value) => {
     if (!value) return;
@@ -347,6 +486,7 @@ function MosqueModal({
     form.setFieldsValue({
       stateId: resolvedIds.stateId,
       divisionId: resolvedIds.divisionId,
+      regionId: resolvedIds.regionId,
       districtId: resolvedIds.districtId,
       talukaId: resolvedIds.talukaId,
       villageCityId: resolvedIds.villageCityId,
@@ -359,6 +499,7 @@ function MosqueModal({
     form.setFieldsValue({
       stateId: undefined,
       divisionId: undefined,
+      regionId: undefined,
       districtId: undefined,
       talukaId: undefined,
       villageCityId: undefined,
@@ -373,6 +514,7 @@ function MosqueModal({
     const parts = [
       states.find((s) => s._id === chain.stateId)?.name,
       divisions.find((d) => d._id === chain.divisionId)?.name,
+      regions.find((r) => r._id === chain.regionId)?.name,
       districts.find((d) => d._id === chain.districtId)?.name,
       talukas.find((t) => t._id === chain.talukaId)?.name,
       villageCities.find((vc) => vc._id === chain.villageCityId)
@@ -382,10 +524,20 @@ function MosqueModal({
     ].filter(Boolean);
 
     return parts.join(" › ");
-  }, [chain, states, divisions, districts, talukas, villageCities, areaLocalities]);
+  }, [
+    chain,
+    states,
+    divisions,
+    regions,
+    districts,
+    talukas,
+    villageCities,
+    areaLocalities,
+  ]);
 
   // =========================
-  // Submit — payload unchanged, only areaLocalityId is sent
+  // Submit — mosque fields unchanged, plus study-center / staff / ledBy /
+  // unemployed-persons fields now merged into the same payload.
   // =========================
   const handleSubmit = async (values) => {
     try {
@@ -432,6 +584,99 @@ function MosqueModal({
 
       if (values.contactNumber?.trim()) {
         payload.contactNumber = values.contactNumber.trim();
+      }
+
+      // --- Led by ---
+      if (values.ledBy) {
+        payload.ledBy = values.ledBy;
+      }
+
+      // --- Masjid staff ---
+      const masjidStaff = {};
+      STAFF_ROLES.forEach(({ key }) => {
+        const staff = values.masjidStaff?.[key];
+        if (staff?.name?.trim() || staff?.contactNumber?.trim()) {
+          masjidStaff[key] = {
+            name: staff?.name?.trim() || undefined,
+            contactNumber: staff?.contactNumber?.trim() || undefined,
+          };
+        }
+      });
+      if (Object.keys(masjidStaff).length) {
+        payload.masjidStaff = masjidStaff;
+      }
+
+      // --- Nearby unemployed graduates / dropouts ---
+      const unemployedPersons = (
+        values.nearestUnemployedGraduatesAndDropouts || []
+      ).filter((p) => p && p.name?.trim() && p.age !== undefined && p.contactNumber?.trim());
+      if (unemployedPersons.length) {
+        payload.nearestUnemployedGraduatesAndDropouts = unemployedPersons.map(
+          (p) => ({
+            name: p.name.trim(),
+            age: p.age,
+            contactNumber: p.contactNumber.trim(),
+          })
+        );
+      }
+
+      // --- Study Center fields ---
+      if (values.studyCenterName?.trim()) {
+        payload.studyCenterName = values.studyCenterName.trim();
+      }
+      if (values.studyCenterStartDate) {
+        payload.studyCenterStartDate = values.studyCenterStartDate.toISOString();
+      }
+      if (
+        values.studyCenterTablesCount !== undefined &&
+        values.studyCenterTablesCount !== null &&
+        values.studyCenterTablesCount !== ""
+      ) {
+        payload.studyCenterTablesCount = values.studyCenterTablesCount;
+      }
+      if (
+        values.studyCenterChairsCount !== undefined &&
+        values.studyCenterChairsCount !== null &&
+        values.studyCenterChairsCount !== ""
+      ) {
+        payload.studyCenterChairsCount = values.studyCenterChairsCount;
+      }
+      if (
+        values.studyCenterCapacity !== undefined &&
+        values.studyCenterCapacity !== null &&
+        values.studyCenterCapacity !== ""
+      ) {
+        payload.studyCenterCapacity = values.studyCenterCapacity;
+      }
+      if (
+        values.studyCenterRoomsCount !== undefined &&
+        values.studyCenterRoomsCount !== null &&
+        values.studyCenterRoomsCount !== ""
+      ) {
+        payload.studyCenterRoomsCount = values.studyCenterRoomsCount;
+      }
+      if (values.studyCenterInchargeName?.trim()) {
+        payload.studyCenterInchargeName = values.studyCenterInchargeName.trim();
+      }
+      if (values.studyCenterContactNumber?.trim()) {
+        payload.studyCenterContactNumber = values.studyCenterContactNumber.trim();
+      }
+      if (values.studyCenterGrade) {
+        payload.studyCenterGrade = values.studyCenterGrade;
+      }
+
+      const studyCenterFacilities = {};
+      FACILITY_FIELDS.forEach(({ key }) => {
+        const facility = values.studyCenterFacilities?.[key];
+        if (facility) {
+          studyCenterFacilities[key] = {
+            available: !!facility.available,
+            condition: facility.condition || "Not Available",
+          };
+        }
+      });
+      if (Object.keys(studyCenterFacilities).length) {
+        payload.studyCenterFacilities = studyCenterFacilities;
       }
 
       let response;
@@ -488,7 +733,7 @@ function MosqueModal({
       onCancel={handleCancel}
       onOk={() => form.submit()}
       confirmLoading={loading}
-      width={700}
+      width={800}
     >
       <Form
         form={form}
@@ -552,6 +797,22 @@ function MosqueModal({
               </Form.Item>
 
               <Form.Item
+                label="Region"
+                name="regionId"
+                rules={[{ required: true, message: "Select region." }]}
+              >
+                <Select
+                  placeholder="Select region"
+                  showSearch
+                  allowClear
+                  optionFilterProp="label"
+                  disabled={!chain.divisionId}
+                  options={regionOptions}
+                  onChange={handleRegionChange}
+                />
+              </Form.Item>
+
+              <Form.Item
                 label="District"
                 name="districtId"
                 rules={[{ required: true, message: "Select district." }]}
@@ -561,7 +822,7 @@ function MosqueModal({
                   showSearch
                   allowClear
                   optionFilterProp="label"
-                  disabled={!chain.divisionId}
+                  disabled={!chain.regionId}
                   options={districtOptions}
                   onChange={handleDistrictChange}
                 />
@@ -683,6 +944,206 @@ function MosqueModal({
           <Form.Item label="Contact Number" name="contactNumber">
             <Input placeholder="Enter contact number" maxLength={15} />
           </Form.Item>
+
+          <Form.Item label="Led By" name="ledBy">
+            <Select
+              placeholder="Select who leads/runs the mosque"
+              allowClear
+              options={LED_BY_OPTIONS}
+            />
+          </Form.Item>
+
+          {/* ===== Masjid staff ===== */}
+          <Divider orientation="left" plain>
+            Masjid Staff
+          </Divider>
+
+          <div className={styles.locationGrid}>
+            {STAFF_ROLES.map(({ key, label }) => (
+              <div key={key} style={{ display: "flex", gap: 8 }}>
+                <Form.Item
+                  label={`${label} Name`}
+                  name={["masjidStaff", key, "name"]}
+                  style={{ flex: 1 }}
+                >
+                  <Input placeholder={`Enter ${label.toLowerCase()} name`} />
+                </Form.Item>
+
+                <Form.Item
+                  label={`${label} Contact`}
+                  name={["masjidStaff", key, "contactNumber"]}
+                  style={{ flex: 1 }}
+                >
+                  <Input
+                    placeholder="Contact number"
+                    maxLength={15}
+                  />
+                </Form.Item>
+              </div>
+            ))}
+          </div>
+
+          {/* ===== Nearby unemployed graduates / dropouts ===== */}
+          <Divider orientation="left" plain>
+            Nearby Unemployed Graduates / Dropouts
+          </Divider>
+
+          <Form.List name="nearestUnemployedGraduatesAndDropouts">
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map(({ key, name, ...restField }) => (
+                  <div
+                    key={key}
+                    style={{ display: "flex", gap: 8, alignItems: "baseline" }}
+                  >
+                    <Form.Item
+                      {...restField}
+                      name={[name, "name"]}
+                      label="Name"
+                      style={{ flex: 2 }}
+                      rules={[{ required: true, message: "Name required." }]}
+                    >
+                      <Input placeholder="Full name" />
+                    </Form.Item>
+
+                    <Form.Item
+                      {...restField}
+                      name={[name, "age"]}
+                      label="Age"
+                      style={{ flex: 1 }}
+                      rules={[{ required: true, message: "Age required." }]}
+                    >
+                      <InputNumber
+                        style={{ width: "100%" }}
+                        min={0}
+                        max={120}
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      {...restField}
+                      name={[name, "contactNumber"]}
+                      label="Contact"
+                      style={{ flex: 2 }}
+                      rules={[
+                        { required: true, message: "Contact required." },
+                      ]}
+                    >
+                      <Input placeholder="Contact number" maxLength={15} />
+                    </Form.Item>
+
+                    <Button
+                      type="text"
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => remove(name)}
+                    />
+                  </div>
+                ))}
+
+                <Form.Item>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    icon={<PlusOutlined />}
+                    block
+                  >
+                    Add Person
+                  </Button>
+                </Form.Item>
+              </>
+            )}
+          </Form.List>
+
+          {/* ===== Study Center details ===== */}
+          <Divider orientation="left" plain>
+            Study Center Details
+          </Divider>
+
+          <Form.Item label="Study Center Name" name="studyCenterName">
+            <Input placeholder="Enter study center name" />
+          </Form.Item>
+
+          <Form.Item label="Start Date" name="studyCenterStartDate">
+            <DatePicker style={{ width: "100%" }} />
+          </Form.Item>
+
+          <div className={styles.locationGrid}>
+            <Form.Item label="Tables Count" name="studyCenterTablesCount">
+              <InputNumber style={{ width: "100%" }} min={0} />
+            </Form.Item>
+
+            <Form.Item label="Chairs Count" name="studyCenterChairsCount">
+              <InputNumber style={{ width: "100%" }} min={0} />
+            </Form.Item>
+
+            <Form.Item label="Seating Capacity" name="studyCenterCapacity">
+              <InputNumber style={{ width: "100%" }} min={0} />
+            </Form.Item>
+
+            <Form.Item label="Rooms Count" name="studyCenterRoomsCount">
+              <InputNumber style={{ width: "100%" }} min={0} />
+            </Form.Item>
+          </div>
+
+          <Form.Item
+            label="Study Center In-charge Name"
+            name="studyCenterInchargeName"
+          >
+            <Input placeholder="Enter in-charge name" />
+          </Form.Item>
+
+          <Form.Item
+            label="Study Center Contact Number"
+            name="studyCenterContactNumber"
+          >
+            <Input placeholder="Enter contact number" maxLength={15} />
+          </Form.Item>
+
+          <Form.Item label="Grade" name="studyCenterGrade">
+            <Select
+              placeholder="Select grade"
+              allowClear
+              options={STUDY_CENTER_GRADE_OPTIONS}
+            />
+          </Form.Item>
+
+          {/* ===== Facilities ===== */}
+          <Divider orientation="left" plain>
+            Facilities
+          </Divider>
+
+          {FACILITY_FIELDS.map(({ key, label }) => (
+            <div
+              key={key}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                marginBottom: 12,
+              }}
+            >
+              <span style={{ flex: 1, fontWeight: 500 }}>{label}</span>
+
+              <Form.Item
+                name={["studyCenterFacilities", key, "available"]}
+                valuePropName="checked"
+                style={{ marginBottom: 0 }}
+              >
+                <Switch checkedChildren="Available" unCheckedChildren="No" />
+              </Form.Item>
+
+              <Form.Item
+                name={["studyCenterFacilities", key, "condition"]}
+                style={{ marginBottom: 0, width: 180 }}
+              >
+                <Select
+                  placeholder="Condition"
+                  options={FACILITY_CONDITION_OPTIONS}
+                />
+              </Form.Item>
+            </div>
+          ))}
         </div>
       </Form>
     </Modal>

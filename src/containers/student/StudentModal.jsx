@@ -20,7 +20,7 @@ const classOptions = [
   { value: "Degree", label: "Degree" },
 ];
 
-// class-driven courseType rules (must mirror backend student.model.js)
+// class-driven courseType rules (must mirror backend student.model.js / student.routes.js)
 const lowerGroup = ["8th", "9th", "10th"];
 const upperGroup = ["11th", "12th", "Degree"];
 
@@ -29,18 +29,11 @@ const lowerGroupCourseOptions = [
   { value: "Self Study", label: "Self Study" },
 ];
 
-const upperGroupCourseOptions = [
-  { value: "Self Study", label: "Self Study" },
-  { value: "Special Course", label: "Special Course" },
-];
+// upperGroup has no courseType options at all — field is hidden entirely for these classes.
 
 const getCourseOptionsForClass = (studentClass) => {
   if (lowerGroup.includes(studentClass)) {
     return lowerGroupCourseOptions;
-  }
-
-  if (upperGroup.includes(studentClass)) {
-    return upperGroupCourseOptions;
   }
 
   return [];
@@ -61,10 +54,11 @@ function StudentModal({
 
   const isEdit = Boolean(studentData);
 
-  // Watch the class field so the courseType radio options update live.
+  // Watch the class field so the courseType field shows/hides live.
   const selectedClass = Form.useWatch("class", form);
 
   const courseOptions = getCourseOptionsForClass(selectedClass);
+  const showCourseType = lowerGroup.includes(selectedClass);
 
   // ---------------------------------------------------------
   // SET FORM DATA
@@ -119,9 +113,15 @@ function StudentModal({
   // ---------------------------------------------------------
   // RESET courseType WHEN THE CLASS GROUP CHANGES
   // (e.g. switching from 9th -> 12th should clear an invalid
-  // courseType selection like "AICU")
+  // courseType selection, and 11th/12th/Degree have no course
+  // type at all)
   // ---------------------------------------------------------
   const handleClassChange = (value) => {
+    if (upperGroup.includes(value)) {
+      form.setFieldsValue({ courseType: undefined });
+      return;
+    }
+
     const validOptions = getCourseOptionsForClass(value).map(
       (option) => option.value
     );
@@ -150,7 +150,12 @@ function StudentModal({
         currentEducationalLevel:
           values.currentEducationalLevel?.trim() || undefined,
         class: values.class,
-        courseType: values.courseType,
+        // Only include courseType for classes that actually support it —
+        // omitting it entirely for 11th/12th/Degree avoids tripping the
+        // backend's Joi.forbidden() rule.
+        courseType: lowerGroup.includes(values.class)
+          ? values.courseType
+          : undefined,
       };
 
       // Study Center is required only while creating (immutable after that).
@@ -346,16 +351,18 @@ function StudentModal({
               />
             </Form.Item>
 
-            {/* COURSE TYPE - depends on selected class */}
-            <Form.Item
-              label="Course Type"
-              name="courseType"
-              rules={[
-                { required: true, message: "Please select course type." },
-              ]}
-            >
-              <Radio.Group disabled={!selectedClass} options={courseOptions} />
-            </Form.Item>
+            {/* COURSE TYPE - only shown for 8th/9th/10th; not applicable for 11th/12th/Degree */}
+            {showCourseType && (
+              <Form.Item
+                label="Course Type"
+                name="courseType"
+                rules={[
+                  { required: true, message: "Please select course type." },
+                ]}
+              >
+                <Radio.Group options={courseOptions} />
+              </Form.Item>
+            )}
 
             {!selectedClass && (
               <p className={styles.helperText}>

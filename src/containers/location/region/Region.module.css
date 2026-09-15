@@ -1,0 +1,66 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.tableCard {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  padding: 16px;
+}
+
+.tableToolbar {
+  margin-bottom: 16px;
+}
+
+.filterArea {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.searchInput {
+  width: 260px;
+}
+
+.districtSelect {
+  width: 220px;
+}
+
+.regionName {
+  font-weight: 500;
+  color: #111827;
+}
+
+.code {
+  font-family: monospace;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: #374151;
+  font-size: 12px;
+}

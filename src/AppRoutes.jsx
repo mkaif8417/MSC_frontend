@@ -5,7 +5,6 @@ import {
   Route,
 } from "react-router-dom";
 import Mosque from "./containers/mosque-management/mosque/Mosque.jsx";
-import StudyCenter from "./containers/study-center/StudyCenter.jsx";
 
 import Login from "./containers/auth/login/Login.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
@@ -13,6 +12,7 @@ import RootLayout from "./layouts/root-layout/RootLayout.jsx";
 import Dashboard from "./containers/dashboard/Dashboard.jsx";
 import State from "./containers/location/state/State.jsx";
 import Division from "./containers/location/division/Division.jsx";
+import Region from "./containers/location/region/Region.jsx";
 import District from "./containers/location/district/District.jsx";
 import Taluka from "./containers/location/taluka/Taluka.jsx";
 import VillageCity from "./containers/location/village-city/VillageCity.jsx";
@@ -47,6 +47,10 @@ function AppRoutes() {
               element={<Division />}
             />
             <Route
+              path="/location/regions"
+              element={<Region />}
+            />
+            <Route
               path="/location/districts"
               element={<District />}
             />
@@ -63,12 +67,11 @@ function AppRoutes() {
               element={<AreaLocality />}
             />
             <Route path="/mosque-management" element={<Mosque />} />
-            <Route path="/study-center" element={<StudyCenter />} />
             <Route path="/teachers" element={<Teacher />} />
             <Route path="/coordinators" element={<Coordinator />} />
             <Route path="/students" element={<Student />} />
             <Route path="/program/:frequency" element={<Program />} />
-<Route path="/program" element={<Navigate to="/program/weekly" replace />} />
+            <Route path="/program" element={<Navigate to="/program/weekly" replace />} />
           </Route>
         </Route>
 
