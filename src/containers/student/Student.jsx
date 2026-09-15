@@ -385,6 +385,7 @@ function Student() {
       columnStyles: { 0: { fontStyle: "bold", cellWidth: 55 } },
       head: [["Field", "Details"]],
       body: [
+        ["Registration No.", record?.regNo || "-"],
         ["Name", record?.name || "-"],
         ["Father/Guardian", record?.fatherGuardianName || "-"],
         ["Mobile Number", record?.mobileNumber || "-"],
@@ -433,7 +434,7 @@ function Student() {
       pageHeight - 10
     );
 
-    doc.save(`${record?.name || "student"}-details.pdf`);
+    doc.save(`${record?.regNo || record?.name || "student"}-details.pdf`);
   } catch (error) {
     console.error("Generate PDF error:", error);
     messageApi.error("Unable to generate PDF. Please try again.");
@@ -444,6 +445,15 @@ function Student() {
   // TABLE COLUMNS
   // ---------------------------------------------------------
   const columns = [
+    {
+      title: "Reg No",
+      dataIndex: "regNo",
+      key: "regNo",
+      fixed: "left",
+      width: 110,
+      render: (value) =>
+        value ? <Tag color="geekblue">{value}</Tag> : "-",
+    },
     {
       title: "Name",
       dataIndex: "name",
@@ -646,7 +656,7 @@ function Student() {
               showTotal: (total) => `Total ${total} students`,
             }}
             onChange={handleTableChange}
-            scroll={{ x: 1400 }}
+            scroll={{ x: 1500 }}
             expandable={{
               expandRowByClick: true,
               expandedRowRender: (record) => (
@@ -718,6 +728,9 @@ function Student() {
         width={600}
       >
         <Descriptions column={1} bordered size="small">
+          <Descriptions.Item label="Registration No.">
+            {viewStudent?.regNo || "-"}
+          </Descriptions.Item>
           <Descriptions.Item label="Name">
             {viewStudent?.name || "-"}
           </Descriptions.Item>

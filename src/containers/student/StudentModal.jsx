@@ -70,6 +70,9 @@ function StudentModal({
 
     if (studentData) {
       form.setFieldsValue({
+        // Display-only — server generated, never edited or submitted.
+        regNo: studentData?.regNo || "",
+
         name: studentData?.name || "",
 
         fatherGuardianName: studentData?.fatherGuardianName || "",
@@ -141,6 +144,9 @@ function StudentModal({
       setLoading(true);
 
       const payload = {
+        // regNo is intentionally never sent — it's server-generated on
+        // create and immutable on update. Including it here would be
+        // pointless at best (backend strips it) and misleading at worst.
         name: values.name?.trim(),
         fatherGuardianName: values.fatherGuardianName?.trim(),
         mobileNumber: values.mobileNumber?.trim() || undefined,
@@ -251,6 +257,13 @@ function StudentModal({
         >
           {/* SCROLLABLE MODAL CONTENT */}
           <div className={styles.studentModalDiv}>
+            {/* REGISTRATION NO. - view-only, server generated, shown only after creation */}
+            {isEdit && (
+              <Form.Item label="Registration No." name="regNo">
+                <Input disabled />
+              </Form.Item>
+            )}
+
             {/* NAME */}
             <Form.Item
               label="Student Name"
