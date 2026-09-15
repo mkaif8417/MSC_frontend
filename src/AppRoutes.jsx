@@ -21,6 +21,9 @@ import Teacher from "./containers/teachers/Teacher.jsx";
 import Coordinator from "./containers/coordinators/Coordinator.jsx";
 import Student from "./containers/student/Student.jsx";
 import Program from "./containers/programs/Program.jsx";
+import Academics from "./containers/academics/Academics.jsx";
+import AcademicSheetPage from "./containers/academics/AcademicSheetPage.jsx";
+
 
 function AppRoutes() {
   return (
@@ -72,6 +75,8 @@ function AppRoutes() {
             <Route path="/students" element={<Student />} />
             <Route path="/program/:frequency" element={<Program />} />
             <Route path="/program" element={<Navigate to="/program/weekly" replace />} />
+<Route path="/academics/:studentId" element={<AcademicSheetPage />} />
+            <Route path="/academics" element={<Academics />} />
           </Route>
         </Route>
 

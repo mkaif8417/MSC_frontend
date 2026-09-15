@@ -1,0 +1,42 @@
+.page {
+  padding: 24px;
+}
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.title {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+.subtitle {
+  color: #6b7280;
+  margin: 4px 0 0;
+}
+.tableCard {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+}
+.tableToolbar {
+  margin-bottom: 12px;
+}
+.filterArea {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.searchInput {
+  width: 240px;
+}
+.studyCenterSelect,
+.classSelect,
+.statusSelect {
+  width: 200px;
+}
+.studentName {
+  font-weight: 500;
+}
